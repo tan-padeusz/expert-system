@@ -1,4 +1,6 @@
 from enum import Enum
+import tkinter
+import tkinter.messagebox as messagebox
 
 
 class Probability(Enum):
@@ -51,11 +53,12 @@ class TemperatureThreshold(Enum):
 
 
 class Patient:
-    def __init__(self, age: int, temperature: float, blood_pressure: int, coughing: bool, alcohol_consumption: AlcoholConsumption):
+    def __init__(self, age: int, temperature: float, blood_pressure: int, cas: bool, bpm: int):
         self.__age = age
         self.__temperature = temperature
         self.__blood_pressure = blood_pressure
-        self.__coughing = coughing
+        self.__cas = cas  # cas -> coughing and sneezing
+        self.__bpm = bpm  # bpm -> beers per month
 
     @property
     def age(self):
@@ -70,46 +73,117 @@ class Patient:
         return self.__blood_pressure
 
     @property
-    def coughing(self):
-        return self.__coughing
+    def cas(self):
+        return self.__cas
+
+    @property
+    def bpm(self):
+        return self.__bpm
+
+# class DiseaseDeterminant:
+#     @staticmethod
+#     def determine_cold_probability(patient: Patient) -> float:
+#         temperature_threshold = TemperatureThreshold.determine_temperature_threshold(patient.temperature)
+#         if temperature_threshold == TemperatureThreshold.DEADLY:
+#             probability = 0.0
+#         else:
+#             cold_temperature = TemperatureThreshold.CRITICAL.value - TemperatureThreshold.ABNORMAL.value
+#             if temperature_threshold == TemperatureThreshold.CRITICAL:
+#                 if patient.temperature < TemperatureThreshold.BASE.value:
+#                     probability = (patient.temperature - (TemperatureThreshold.BASE.value - TemperatureThreshold.CRITICAL.value)) / cold_temperature
+#                 else:
+#                     probability = 1.0 - ((patient.temperature - (TemperatureThreshold.BASE.value + TemperatureThreshold.ABNORMAL.value)) / cold_temperature)
+#             else:
+#                 absolute_temperature = abs(TemperatureThreshold.BASE.value - patient.temperature)
+#                 probability = absolute_temperature / cold_temperature
+#         if temperature_threshold != TemperatureThreshold.DEADLY and patient.cas:
+#             probability = probability + 0.1
+#         return min(probability, 1)
+#
+#     @staticmethod
+#     def determine_heart_problem_probability(patient: Patient) -> float:
+#         return 0.0
+#
+#     @staticmethod
+#     def determine_liver_problem_probability(patient: Patient) -> float:
+#         return 0.0
+#
+#     @staticmethod
+#     def determine_death_probability(patient: Patient) -> float:
+#         return 0.0
+#
+#     @staticmethod
+#     def determine_other_disease_probability(patient: Patient) -> float:
+#         return 0.0
+
 
 class DiseaseDeterminant:
-    @staticmethod
-    def determine_cold_probability(patient: Patient) -> float:
-        temperature_threshold = TemperatureThreshold.determine_temperature_threshold(patient.temperature)
-        if temperature_threshold == TemperatureThreshold.DEADLY:
-            probability = 0.0
-        else:
-            cold_temperature = TemperatureThreshold.CRITICAL.value - TemperatureThreshold.ABNORMAL.value
-            if temperature_threshold == TemperatureThreshold.CRITICAL:
-                if patient.temperature < TemperatureThreshold.BASE.value:
-                    probability = (patient.temperature - (TemperatureThreshold.BASE.value - TemperatureThreshold.CRITICAL.value)) / cold_temperature
-                else:
-                    probability = 1.0 - ((patient.temperature - (TemperatureThreshold.BASE.value + TemperatureThreshold.ABNORMAL.value)) / cold_temperature)
+    def __init__(self, patient: Patient):
+        self.__patient = patient
+
+    def determine_cold_probability(self):
+        base_temperature = 36.5
+        temperature = self.__patient.temperature
+        probability = 0.0
+        att = 2.5  # att -> abnormal temperature threshold
+        ctt = 5.5  # ctt -> critical temperature threshold
+        if base_temperature - att <= temperature <= base_temperature + att:
+            absolute_temperature = abs(base_temperature - temperature)
+            probability = absolute_temperature / att
+        elif base_temperature - ctt <= temperature <= base_temperature + ctt:
+            if temperature < base_temperature:
+                relative_temperature = temperature - (base_temperature - ctt)
+                probability = relative_temperature / (ctt - att)
             else:
-                absolute_temperature = abs(TemperatureThreshold.BASE.value - patient.temperature)
-                probability = absolute_temperature / cold_temperature
-        if temperature_threshold != TemperatureThreshold.DEADLY and patient.coughing:
+                relative_temperature = temperature - (base_temperature + att)
+                probability = 1.0 - (relative_temperature / (ctt - att))
+        else:
+            probability = 0.0
+
+        if self.__patient.cas:
             probability = probability + 0.1
-        return min(probability, 1)
+        if self.__patient.age <= 12:
+            probability = probability * 1.1
+        return min(probability, 1.0)
+
+
+class PatientApplication:
+    def __init__(self):
+        self.__root = tkinter.Tk()
+        self.__root.title("app")
+
+        self.__age_label = tkinter.Label(self.__root, text="age:")
+        self.__age_label.grid(row=0, column=0, columnspan=2)
+        self.__age_entry = tkinter.Entry(self.__root)
+        self.__age_entry.grid(row=0, column=2, columnspan=3)
+
+        self.__temperature_label = tkinter.Label(self.__root, text="temperature:")
+        self.__temperature_label.grid(row=1, column=0, columnspan=2)
+        self.__temperature_entry = tkinter.Entry(self.__root)
+        self.__temperature_entry.grid(row=1, column=2, columnspan=3)
+
+        self.__cas_label = tkinter.Label(self.__root, text="cas:")
+        self.__cas_label.grid(row=2, column=0, columnspan=2)
+        self.__cas_entry = tkinter.Entry(self.__root)
+        self.__cas_entry.grid(row=2, column=2, columnspan=3)
+
+        self.__info_button = tkinter.Button(self.__root, text="info")
+        self.__info_button.grid(row=3, column=0, columnspan=2)
+        self.__info_button["command"] = PatientApplication.__show_info
+        self.__determine_disease_button = tkinter.Button(self.__root, text="determine disease")
+        self.__determine_disease_button.grid(row=3, column=2, columnspan=3)
 
     @staticmethod
-    def determine_heart_problem_probability(patient: Patient) -> float:
-        return 0.0
+    def __show_info():
+        messagebox.showinfo("info", "expert system by Maciej Moryń & Przemysław Gogacz")
 
-    @staticmethod
-    def determine_liver_problem_probability(patient: Patient) -> float:
-        return 0.0
-
-    @staticmethod
-    def determine_death_probability(patient: Patient) -> float:
-        return 0.0
-
-    @staticmethod
-    def determine_other_disease_probability(patient: Patient) -> float:
-        return 0.0
+    def run(self):
+        self.__root.mainloop()
 
 
 if __name__ == "__main__":
-    p = Patient(13, 34.0, 0, False)
-    print(DiseaseDeterminant.determine_cold_probability(p))
+    # app = PatientApplication()
+    # app.run()
+    patient = Patient(13, 33.6, 100, False, 3000)
+    determinant = DiseaseDeterminant(patient)
+    print(determinant.determine_cold_probability())
