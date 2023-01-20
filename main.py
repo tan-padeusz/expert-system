@@ -33,32 +33,15 @@ class Disease(Enum):
     OTHER_DISEASE = "other disease"
 
 
-class TemperatureThreshold(Enum):
-    BASE = 36.5
-    NORMAL = 0.5
-    ABNORMAL = 2.5
-    CRITICAL = 5.5
-    DEADLY = 100.0
-
-    @staticmethod
-    def determine_temperature_threshold(temperature: float):
-        if 36.0 <= temperature <= 37.0:
-            return TemperatureThreshold.NORMAL
-        elif 34.0 <= temperature <= 39.0:
-            return TemperatureThreshold.ABNORMAL
-        elif 31.0 <= temperature <= 42.0:
-            return TemperatureThreshold.CRITICAL
-        else:
-            return TemperatureThreshold.DEADLY
-
-
 class Patient:
-    def __init__(self, age: int, temperature: float, blood_pressure: int, cas: bool, bpm: int):
+    def __init__(self, age: int, temperature: float, blood_pressure: int, cas: bool, bpm: int, fed: bool, weight: float):
         self.__age = age
         self.__temperature = temperature
         self.__blood_pressure = blood_pressure
         self.__cas = cas  # cas -> coughing and sneezing
         self.__bpm = bpm  # bpm -> beers per month
+        self.__fed = fed  # fed -> family early deaths
+        self.__weight = weight
 
     @property
     def age(self):
@@ -80,41 +63,13 @@ class Patient:
     def bpm(self):
         return self.__bpm
 
-# class DiseaseDeterminant:
-#     @staticmethod
-#     def determine_cold_probability(patient: Patient) -> float:
-#         temperature_threshold = TemperatureThreshold.determine_temperature_threshold(patient.temperature)
-#         if temperature_threshold == TemperatureThreshold.DEADLY:
-#             probability = 0.0
-#         else:
-#             cold_temperature = TemperatureThreshold.CRITICAL.value - TemperatureThreshold.ABNORMAL.value
-#             if temperature_threshold == TemperatureThreshold.CRITICAL:
-#                 if patient.temperature < TemperatureThreshold.BASE.value:
-#                     probability = (patient.temperature - (TemperatureThreshold.BASE.value - TemperatureThreshold.CRITICAL.value)) / cold_temperature
-#                 else:
-#                     probability = 1.0 - ((patient.temperature - (TemperatureThreshold.BASE.value + TemperatureThreshold.ABNORMAL.value)) / cold_temperature)
-#             else:
-#                 absolute_temperature = abs(TemperatureThreshold.BASE.value - patient.temperature)
-#                 probability = absolute_temperature / cold_temperature
-#         if temperature_threshold != TemperatureThreshold.DEADLY and patient.cas:
-#             probability = probability + 0.1
-#         return min(probability, 1)
-#
-#     @staticmethod
-#     def determine_heart_problem_probability(patient: Patient) -> float:
-#         return 0.0
-#
-#     @staticmethod
-#     def determine_liver_problem_probability(patient: Patient) -> float:
-#         return 0.0
-#
-#     @staticmethod
-#     def determine_death_probability(patient: Patient) -> float:
-#         return 0.0
-#
-#     @staticmethod
-#     def determine_other_disease_probability(patient: Patient) -> float:
-#         return 0.0
+    @property
+    def fed(self):
+        return self.__fed
+
+    @property
+    def weight(self):
+        return self.__weight
 
 
 class DiseaseDeterminant:
@@ -142,15 +97,36 @@ class DiseaseDeterminant:
 
         if self.__patient.cas:
             probability = probability + 0.1
-        if self.__patient.age <= 12:
-            probability = probability * 1.1
+
+        age = self.__patient.age
+        min_age = 12
+        max_age = 64
+        max_age_multiplier = 0.15
+        if age <= min_age or age >= max_age:
+            age_multiplier = 1.0 + max_age_multiplier
+        else:
+            midpoint = (max_age - min_age) / 2
+            absolute_age = abs(midpoint - age)
+            age_multiplier = 1.0 + max_age_multiplier * (absolute_age / (max_age - midpoint))
+        probability = probability * age_multiplier
         return min(probability, 1.0)
+
+    # def determine_liver_problem_probability(self):
+    #     month_length = 28.0
+    #     apd = self.__patient.bpm / month_length  # apd -> average (beers) per day
+    #     opw = 1.0 / 7.0  # opw -> one per week
+    #     opd = 1.0  # opd -> one per day
+    #     if apd <= opw:
+    #         probability = 1.0 / 14
+    #     elif apd <= opd:
+    #         probability =
+    #     return 0.0
 
 
 class PatientApplication:
     def __init__(self):
         self.__root = tkinter.Tk()
-        self.__root.title("app")
+        self.__root.title("es")
 
         self.__age_label = tkinter.Label(self.__root, text="age:")
         self.__age_label.grid(row=0, column=0, columnspan=2)
@@ -172,18 +148,24 @@ class PatientApplication:
         self.__info_button["command"] = PatientApplication.__show_info
         self.__determine_disease_button = tkinter.Button(self.__root, text="determine disease")
         self.__determine_disease_button.grid(row=3, column=2, columnspan=3)
+        self.__determine_disease_button["command"] = self.__determine_disease
 
     @staticmethod
     def __show_info():
         messagebox.showinfo("info", "expert system by Maciej Moryń & Przemysław Gogacz")
+
+    def __determine_disease(self):
+        patient = Patient(16, 32.0, 100, True, 100, True)
+        determinant = DiseaseDeterminant(patient)
+        cold_probability = round(determinant.determine_cold_probability(), ndigits=3)
+        cold_probability_enum = Probability.determine_probability(cold_probability)
+        result = F"cold : {cold_probability_enum.name} [{cold_probability * 100}%]"
+        messagebox.showinfo("results", result)
 
     def run(self):
         self.__root.mainloop()
 
 
 if __name__ == "__main__":
-    # app = PatientApplication()
-    # app.run()
-    patient = Patient(13, 33.6, 100, False, 3000)
-    determinant = DiseaseDeterminant(patient)
-    print(determinant.determine_cold_probability())
+    app = PatientApplication()
+    app.run()
