@@ -44,7 +44,10 @@ class Patient:
             temperature: float,
             blood_pressure: int,
             cas: bool,
+            waf: bool,
             bpm: int,
+            umw: int,
+            tpw: int,
             fed: bool,
             weight: float,
             height: float,
@@ -54,7 +57,10 @@ class Patient:
         self.__temperature = temperature
         self.__blood_pressure = blood_pressure
         self.__cas = cas  # cas -> coughing and sneezing
+        self.__waf = waf # waf -> weakness and fatigue
         self.__bpm = bpm  # bpm -> beers per month
+        self.__umw = umw  # umw -> unhealthy meals a week
+        self.__tpw = tpw  # tpw -> training per week
         self.__fed = fed  # fed -> family early deaths
         self.__weight = weight
         self.__height = height
@@ -75,11 +81,23 @@ class Patient:
     @property
     def cas(self):
         return self.__cas
+    
+    @property
+    def waf(self):
+        return self.__waf
 
     @property
     def bpm(self):
         return self.__bpm
 
+    @property
+    def umw(self):
+        return self.__umw
+    
+    @property
+    def tpw(self):
+        return self.__tpw
+    
     @property
     def fed(self):
         return self.__fed
@@ -100,7 +118,52 @@ class Patient:
 class DiseaseDeterminant:
     def __init__(self, patient: Patient):
         self.__patient = patient
+    
+    def determine_obesity_probability(self): # otyłość
+        height = self.__patient.height
+        weights = self.__patient.weight
+        bmi = (weights / height ** 2)
+        if bmi < 10:
+            probability = 0.0 + (self.__patient.age / 80) * 0.2
+        elif bmi < 20 :
+            probability = 0.2 + (self.__patient.age / 80) * 0.2
+        elif bmi < 30 :
+            probability = 0.4 + (self.__patient.age / 80) * 0.2
+        else :
+            probability = 0.6 + (self.__patient.age / 80) * 0.2
 
+        probability = probability + ((self.__patient.umw / 7) * 0.1) - ((self.__patient.tpw / 5) * 0.2)
+
+        return min(max(probability, 0.0), 1.0)
+    
+    def determine_flu_probability(self):  # grypa
+        normal_temperature = 36.5
+        temperature = self.__patient.temperature
+        probability = 0.0
+        if self.__patient.cas:
+            probability = probability + (self.__patient.age / 80) 
+        if self.__patient.waf:
+            probability = probability + (self.__patient.age / 70) 
+
+        if normal_temperature < temperature:
+            abs_temperature = abs(normal_temperature-temperature) 
+            probability = probability + (abs_temperature / 5) * 0.4
+
+        return min(probability, 1.0)
+    
+    def determine_heart_attack_probability(self): # atak serca
+        age = self.__patient.age
+        obesity = self.determine_obesity_probability()
+        liver = self.determine_liver_problem_probability()
+        probability = age * 0.75 / 100
+
+        if obesity > 0.9 and liver > 0.9:
+            probability = 1
+        else:
+            probability = (0.4 * obesity + 0.6 * liver) * 0.7
+
+        return min(probability, 1.0)
+    
     def determine_cold_probability(self):
         base_temperature = 36.5
         temperature = self.__patient.temperature
@@ -205,39 +268,60 @@ class PatientApplication:
         self.__bpm_entry = tkinter.Entry(self.__root)
         self.__bpm_entry.grid(row=4, column=3, columnspan=3)
 
+        self.__umw_unit_label = tkinter.Label(self.__root, text="[int]")
+        self.__umw_unit_label.grid(row=5, column=0, columnspan=1)
+        self.__umw_label = tkinter.Label(self.__root, text="umw:")
+        self.__umw_label.grid(row=5, column=1, columnspan=2)
+        self.__umw_entry = tkinter.Entry(self.__root)
+        self.__umw_entry.grid(row=5, column=3, columnspan=3)
+
+        self.__tpw_unit_label = tkinter.Label(self.__root, text="[int]")
+        self.__tpw_unit_label.grid(row=6, column=0, columnspan=1)
+        self.__tpw_label = tkinter.Label(self.__root, text="tpw:")
+        self.__tpw_label.grid(row=6, column=1, columnspan=2)
+        self.__tpw_entry = tkinter.Entry(self.__root)
+        self.__tpw_entry.grid(row=6, column=3, columnspan=3)
+
         self.__fed_unit_label = tkinter.Label(self.__root, text="[bool]")
-        self.__fed_unit_label.grid(row=5, column=0, columnspan=1)
+        self.__fed_unit_label.grid(row=7, column=0, columnspan=1)
         self.__fed_label = tkinter.Label(self.__root, text="fed:")
-        self.__fed_label.grid(row=5, column=1, columnspan=2)
+        self.__fed_label.grid(row=7, column=1, columnspan=2)
         self.__fed_entry = tkinter.Entry(self.__root)
-        self.__fed_entry.grid(row=5, column=3, columnspan=3)
+        self.__fed_entry.grid(row=7, column=3, columnspan=3)
 
         self.__weight_unit_label = tkinter.Label(self.__root, text="[float]")
-        self.__weight_unit_label.grid(row=6, column=0, columnspan=1)
+        self.__weight_unit_label.grid(row=8, column=0, columnspan=1)
         self.__weight_label = tkinter.Label(self.__root, text="weight:")
-        self.__weight_label.grid(row=6, column=1, columnspan=2)
+        self.__weight_label.grid(row=8, column=1, columnspan=2)
         self.__weight_entry = tkinter.Entry(self.__root)
-        self.__weight_entry.grid(row=6, column=3, columnspan=3)
+        self.__weight_entry.grid(row=8, column=3, columnspan=3)
 
         self.__height_unit_label = tkinter.Label(self.__root, text="[float]")
-        self.__height_unit_label.grid(row=7, column=0, columnspan=1)
+        self.__height_unit_label.grid(row=9, column=0, columnspan=1)
         self.__height_label = tkinter.Label(self.__root, text="height:")
-        self.__height_label.grid(row=7, column=1, columnspan=2)
+        self.__height_label.grid(row=9, column=1, columnspan=2)
         self.__height_entry = tkinter.Entry(self.__root)
-        self.__height_entry.grid(row=7, column=3, columnspan=3)
+        self.__height_entry.grid(row=9, column=3, columnspan=3)
 
         self.__sex_unit_label = tkinter.Label(self.__root, text="[sex]")
-        self.__sex_unit_label.grid(row=8, column=0, columnspan=1)
+        self.__sex_unit_label.grid(row=10, column=0, columnspan=1)
         self.__sex_label = tkinter.Label(self.__root, text="sex:")
-        self.__sex_label.grid(row=8, column=1, columnspan=2)
+        self.__sex_label.grid(row=10, column=1, columnspan=2)
         self.__sex_entry = tkinter.Entry(self.__root)
-        self.__sex_entry.grid(row=8, column=3, columnspan=3)
+        self.__sex_entry.grid(row=10, column=3, columnspan=3)
+
+        self.__waf_unit_label = tkinter.Label(self.__root, text="[bool]")
+        self.__waf_unit_label.grid(row=11, column=0, columnspan=1)
+        self.__waf_label = tkinter.Label(self.__root, text="waf:")
+        self.__waf_label.grid(row=11, column=1, columnspan=2)
+        self.__waf_entry = tkinter.Entry(self.__root)
+        self.__waf_entry.grid(row=11, column=3, columnspan=3)
 
         self.__info_button = tkinter.Button(self.__root, text="info")
-        self.__info_button.grid(row=9, column=0, columnspan=1)
+        self.__info_button.grid(row=12, column=0, columnspan=1)
         self.__info_button["command"] = PatientApplication.__show_info
         self.__determine_disease_button = tkinter.Button(self.__root, text="determine disease")
-        self.__determine_disease_button.grid(row=9, column=1, columnspan=5)
+        self.__determine_disease_button.grid(row=12, column=1, columnspan=5)
         self.__determine_disease_button["command"] = self.__determine_disease
 
     @staticmethod
@@ -326,11 +410,23 @@ class PatientApplication:
         cas_value = PatientApplication.__validate_bool_entry(self.__cas_entry.get(), "cas")
         if cas_value is None:
             return
+        
+        waf_value = PatientApplication.__validate_bool_entry(self.__waf_entry.get(), "waf")
+        if waf_value is None:
+            return
 
         bpm_value = PatientApplication.__validate_int_entry(self.__bpm_entry.get(), "bpm", False)
         if bpm_value is None:
             return
-
+        
+        umw_value = PatientApplication.__validate_int_entry(self.__umw_entry.get(), "umw", False)
+        if umw_value is None:
+            return
+        
+        tpw_value = PatientApplication.__validate_int_entry(self.__tpw_entry.get(), "tpw", False)
+        if tpw_value is None:
+            return
+        
         fed_value = PatientApplication.__validate_bool_entry(self.__fed_entry.get(), "fed")
         if fed_value is None:
             return
@@ -352,7 +448,10 @@ class PatientApplication:
             temperature_value,
             blood_pressure_value,
             cas_value,
+            waf_value,
             bpm_value,
+            umw_value,
+            tpw_value,
             fed_value,
             weight_value,
             height_value,
@@ -369,11 +468,26 @@ class PatientApplication:
         liver_problem_probability_enum = Probability.determine_probability(liver_problem_probability)
         liver_problem_probability_percent = round(liver_problem_probability * 100, ndigits=3)
         liver_problem_string = F"liver problem : {liver_problem_probability_enum.name} [{liver_problem_probability_percent}%]"
+        
+        obesity_probability = determinant.determine_obesity_probability()
+        obesity_probability_enum = Probability.determine_probability(obesity_probability)
+        obesity_probability_percent = round(obesity_probability * 100, ndigits=3)
+        obesity_problem_string = F"obesity : {obesity_probability_enum.name} [{obesity_probability_percent}%]"
+        
+        flu_probability = determinant.determine_flu_probability()
+        flu_probability_enum = Probability.determine_probability(flu_probability)
+        flu_probability_percent = round(flu_probability * 100, ndigits=3)
+        flu_problem_string = F"flu : {flu_probability_enum.name} [{flu_probability_percent}%]"
+
+        heart_attack_probability = determinant.determine_heart_attack_probability()
+        heart_attack_probability_enum = Probability.determine_probability(heart_attack_probability)
+        heart_attack_probability_percent = round(heart_attack_probability * 100, ndigits=3)
+        heart_attack_string = F"heart_attack : {heart_attack_probability_enum.name} [{heart_attack_probability_percent}%]"
 
         messagebox.showinfo("results",
-                            F"{cold_string}\n{liver_problem_string}"
-                            )
-
+                            F"{cold_string}\n{liver_problem_string}\n{obesity_problem_string}\n{flu_problem_string}\n{heart_attack_string}" )
+        # messagebox.showinfo("results",
+        #                     F"{flu_problem_string}" )  
     def run(self):
         self.__root.mainloop()
 
