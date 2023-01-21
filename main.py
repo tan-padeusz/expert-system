@@ -24,6 +24,10 @@ class Probability(Enum):
             return Probability.HIGH
 
 
+class Sex(Enum):
+    FEMALE = "female"
+    MALE = "male"
+
 class Disease(Enum):
     NONE = "none"
     COLD = "cold"
@@ -43,7 +47,8 @@ class Patient:
             bpm: int,
             fed: bool,
             weight: float,
-            height: float
+            height: float,
+            sex: Sex
     ):
         self.__age = age
         self.__temperature = temperature
@@ -53,6 +58,7 @@ class Patient:
         self.__fed = fed  # fed -> family early deaths
         self.__weight = weight
         self.__height = height
+        self.__sex = sex
 
     @property
     def age(self):
@@ -85,6 +91,10 @@ class Patient:
     @property
     def height(self):
         return self.__height
+
+    @property
+    def sex(self):
+        return self.__sex
 
 
 class DiseaseDeterminant:
@@ -160,98 +170,194 @@ class PatientApplication:
         self.__root = tkinter.Tk()
         self.__root.title("es")
 
+        self.__age_unit_label = tkinter.Label(self.__root, text="[int]")
+        self.__age_unit_label.grid(row=0, column=0, columnspan=1)
         self.__age_label = tkinter.Label(self.__root, text="age:")
-        self.__age_label.grid(row=0, column=0, columnspan=2)
+        self.__age_label.grid(row=0, column=1, columnspan=2)
         self.__age_entry = tkinter.Entry(self.__root)
-        self.__age_entry.grid(row=0, column=2, columnspan=3)
+        self.__age_entry.grid(row=0, column=3, columnspan=3)
 
+        self.__temperature_unit_label = tkinter.Label(self.__root, text="[float]")
+        self.__temperature_unit_label.grid(row=1, column=0, columnspan=1)
         self.__temperature_label = tkinter.Label(self.__root, text="temperature:")
-        self.__temperature_label.grid(row=1, column=0, columnspan=2)
+        self.__temperature_label.grid(row=1, column=1, columnspan=2)
         self.__temperature_entry = tkinter.Entry(self.__root)
-        self.__temperature_entry.grid(row=1, column=2, columnspan=3)
+        self.__temperature_entry.grid(row=1, column=3, columnspan=3)
 
+        self.__blood_pressure_unit_label = tkinter.Label(self.__root, text="[int]")
+        self.__blood_pressure_unit_label.grid(row=2, column=0, columnspan=1)
+        self.__blood_pressure_label = tkinter.Label(self.__root, text="blood pressure:")
+        self.__blood_pressure_label.grid(row=2, column=1, columnspan=2)
+        self.__blood_pressure_entry = tkinter.Entry(self.__root)
+        self.__blood_pressure_entry.grid(row=2, column=3, columnspan=3)
+
+        self.__cas_unit_label = tkinter.Label(self.__root, text="[bool]")
+        self.__cas_unit_label.grid(row=3, column=0, columnspan=1)
         self.__cas_label = tkinter.Label(self.__root, text="cas:")
-        self.__cas_label.grid(row=2, column=0, columnspan=2)
+        self.__cas_label.grid(row=3, column=1, columnspan=2)
         self.__cas_entry = tkinter.Entry(self.__root)
-        self.__cas_entry.grid(row=2, column=2, columnspan=3)
+        self.__cas_entry.grid(row=3, column=3, columnspan=3)
 
-        self.__fed_label = tkinter.Label(self.__root, text="fed:")
-        self.__fed_label.grid(row=3, column=0, columnspan=2)
-        self.__fed_entry = tkinter.Entry(self.__root)
-        self.__fed_entry.grid(row=3, column=2, columnspan=3)
-
+        self.__bpm_unit_label = tkinter.Label(self.__root, text="[int]")
+        self.__bpm_unit_label.grid(row=4, column=0, columnspan=1)
         self.__bpm_label = tkinter.Label(self.__root, text="bpm:")
-        self.__bpm_label.grid(row=4, column=0, columnspan=2)
+        self.__bpm_label.grid(row=4, column=1, columnspan=2)
         self.__bpm_entry = tkinter.Entry(self.__root)
-        self.__bpm_entry.grid(row=4, column=2, columnspan=3)
+        self.__bpm_entry.grid(row=4, column=3, columnspan=3)
+
+        self.__fed_unit_label = tkinter.Label(self.__root, text="[bool]")
+        self.__fed_unit_label.grid(row=5, column=0, columnspan=1)
+        self.__fed_label = tkinter.Label(self.__root, text="fed:")
+        self.__fed_label.grid(row=5, column=1, columnspan=2)
+        self.__fed_entry = tkinter.Entry(self.__root)
+        self.__fed_entry.grid(row=5, column=3, columnspan=3)
+
+        self.__weight_unit_label = tkinter.Label(self.__root, text="[float]")
+        self.__weight_unit_label.grid(row=6, column=0, columnspan=1)
+        self.__weight_label = tkinter.Label(self.__root, text="weight:")
+        self.__weight_label.grid(row=6, column=1, columnspan=2)
+        self.__weight_entry = tkinter.Entry(self.__root)
+        self.__weight_entry.grid(row=6, column=3, columnspan=3)
+
+        self.__height_unit_label = tkinter.Label(self.__root, text="[float]")
+        self.__height_unit_label.grid(row=7, column=0, columnspan=1)
+        self.__height_label = tkinter.Label(self.__root, text="height:")
+        self.__height_label.grid(row=7, column=1, columnspan=2)
+        self.__height_entry = tkinter.Entry(self.__root)
+        self.__height_entry.grid(row=7, column=3, columnspan=3)
+
+        self.__sex_unit_label = tkinter.Label(self.__root, text="[sex]")
+        self.__sex_unit_label.grid(row=8, column=0, columnspan=1)
+        self.__sex_label = tkinter.Label(self.__root, text="sex:")
+        self.__sex_label.grid(row=8, column=1, columnspan=2)
+        self.__sex_entry = tkinter.Entry(self.__root)
+        self.__sex_entry.grid(row=8, column=3, columnspan=3)
 
         self.__info_button = tkinter.Button(self.__root, text="info")
-        self.__info_button.grid(row=5, column=0, columnspan=2)
+        self.__info_button.grid(row=9, column=0, columnspan=1)
         self.__info_button["command"] = PatientApplication.__show_info
         self.__determine_disease_button = tkinter.Button(self.__root, text="determine disease")
-        self.__determine_disease_button.grid(row=5, column=2, columnspan=3)
+        self.__determine_disease_button.grid(row=9, column=1, columnspan=5)
         self.__determine_disease_button["command"] = self.__determine_disease
 
     @staticmethod
     def __show_info():
         messagebox.showinfo("info", "expert system by Maciej Moryń & Przemysław Gogacz")
 
+    @staticmethod
+    def __validate_int_entry(value: str, value_name: str, allow_negative: bool):
+        if allow_negative:
+            error_message = F"{value_name} must be integer value"
+        else:
+            error_message = F"{value_name} must be non-negative integer value"
+
+        if len(value) == 0:
+            messagebox.showerror("error", F"{value_name} must not be empty")
+            return None
+        try:
+            int_value = int(value)
+            if not allow_negative and int_value < 0:
+                messagebox.showerror("error", error_message)
+                return None
+            return int_value
+        except ValueError:
+            messagebox.showerror("error", error_message)
+            return None
+
+    @staticmethod
+    def __validate_float_entry(value: str, value_name: str, allow_negative: bool):
+        if allow_negative:
+            error_message = F"{value_name} must be float value"
+        else:
+            error_message = F"{value_name} must be non-negative float value"
+
+        if len(value) == 0:
+            messagebox.showerror("error", F"{value_name} must not be empty")
+            return None
+        try:
+            float_value = float(value)
+            if not allow_negative and float_value < 0.0:
+                messagebox.showerror("error", error_message)
+                return None
+            return float_value
+        except ValueError:
+            messagebox.showerror("error", error_message)
+            return None
+
+    @staticmethod
+    def __validate_bool_entry(value: str, value_name: str):
+        if len(value) == 0:
+            messagebox.showerror("error", F"{value_name} must not be empty")
+            return None
+        if value == "true":
+            return True
+        elif value == "false":
+            return False
+        else:
+            messagebox.showerror("error", F"{value_name} must be bool [\'true\'\\\'false\'] value")
+            return None
+
+    @staticmethod
+    def __validate_sex_entry(value: str):
+        if len(value) == 0:
+            messagebox.showerror("error", "sex value must not be empty")
+            return None
+        if value == "female":
+            return Sex.FEMALE
+        elif value == "male":
+            return Sex.MALE
+        else:
+            messagebox.showerror("error", "sex value must be \'female\' or \'male\'")
+            return None
+
     def __determine_disease(self):
-        age_input = self.__age_entry.get()
-        if len(age_input) == 0:
-            messagebox.showerror("error", "age must not be empty")
-            return
-        try:
-            age_value = int(age_input)
-        except ValueError:
-            messagebox.showerror("error", "age must be integer value")
+        age_value = PatientApplication.__validate_int_entry(self.__age_entry.get(), "age", False)
+        if age_value is None:
             return
 
-        temperature_input = self.__temperature_entry.get()
-        if len(temperature_input) == 0:
-            messagebox.showerror("error", "temperature must not be empty")
-            return
-        try:
-            temperature_value = float(temperature_input)
-        except ValueError:
-            messagebox.showerror("error", "temperature must be float value")
+        temperature_value = PatientApplication.__validate_float_entry(self.__temperature_entry.get(), "temperature", True)
+        if temperature_value is None:
             return
 
-        cas_input = self.__cas_entry.get()
-        if len(cas_input) == 0:
-            messagebox.showerror("error", "cas must not be empty")
-            return
-        if cas_input == "true":
-            cas_value = True
-        elif cas_input == "false":
-            cas_value = False
-        else:
-            messagebox.showerror("error", "cas must be bool value")
+        blood_pressure_value = PatientApplication.__validate_int_entry(self.__blood_pressure_entry.get(), "blood pressure", False)
+        if blood_pressure_value is None:
             return
 
-        fed_input = self.__fed_entry.get()
-        if len(fed_input) == 0:
-            messagebox.showerror("error", "fed must not be empty")
-            return
-        if fed_input == "true":
-            fed_value = True
-        elif fed_input == "false":
-            fed_value = False
-        else:
-            messagebox.showerror("error", "fed must be bool value")
+        cas_value = PatientApplication.__validate_bool_entry(self.__cas_entry.get(), "cas")
+        if cas_value is None:
             return
 
-        bpm_input = self.__bpm_entry.get()
-        if len(bpm_input) == 0:
-            messagebox.showerror("error", "bpm must not be empty")
-            return
-        try:
-            bpm_value = int(bpm_input)
-        except ValueError:
-            messagebox.showerror("error", "bpm must be integer value")
+        bpm_value = PatientApplication.__validate_int_entry(self.__bpm_entry.get(), "bpm", False)
+        if bpm_value is None:
             return
 
-        patient = Patient(age_value, temperature_value, 100, cas_value, bpm_value, fed_value, 60.0, 1.5)
+        fed_value = PatientApplication.__validate_bool_entry(self.__fed_entry.get(), "fed")
+        if fed_value is None:
+            return
+
+        weight_value = PatientApplication.__validate_float_entry(self.__weight_entry.get(), "weight", False)
+        if weight_value is None:
+            return
+
+        height_value = PatientApplication.__validate_float_entry(self.__height_entry.get(), "height", False)
+        if height_value is None:
+            return
+
+        sex_value = PatientApplication.__validate_sex_entry(self.__sex_entry.get())
+        if sex_value is None:
+            return
+
+        patient = Patient(
+            age_value,
+            temperature_value,
+            blood_pressure_value,
+            cas_value,
+            bpm_value,
+            fed_value,
+            weight_value,
+            height_value,
+            sex_value
+        )
         determinant = DiseaseDeterminant(patient)
 
         cold_probability = determinant.determine_cold_probability()
