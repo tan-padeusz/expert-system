@@ -232,35 +232,35 @@ class PatientApplication:
 
         self.__cas_unit_label = tkinter.Label(self.__root, text="[bool]")
         self.__cas_unit_label.grid(row=2, column=0, columnspan=1)
-        self.__cas_label = tkinter.Label(self.__root, text="cas:")
+        self.__cas_label = tkinter.Label(self.__root, text="coughing and sneezing:")
         self.__cas_label.grid(row=2, column=1, columnspan=2)
         self.__cas_entry = tkinter.Entry(self.__root)
         self.__cas_entry.grid(row=2, column=3, columnspan=3)
 
         self.__bpm_unit_label = tkinter.Label(self.__root, text="[int]")
         self.__bpm_unit_label.grid(row=3, column=0, columnspan=1)
-        self.__bpm_label = tkinter.Label(self.__root, text="bpm:")
+        self.__bpm_label = tkinter.Label(self.__root, text="beers per month:")
         self.__bpm_label.grid(row=3, column=1, columnspan=2)
         self.__bpm_entry = tkinter.Entry(self.__root)
         self.__bpm_entry.grid(row=3, column=3, columnspan=3)
 
         self.__umw_unit_label = tkinter.Label(self.__root, text="[int]")
         self.__umw_unit_label.grid(row=4, column=0, columnspan=1)
-        self.__umw_label = tkinter.Label(self.__root, text="umw:")
+        self.__umw_label = tkinter.Label(self.__root, text="unhealthy meals a week:")
         self.__umw_label.grid(row=4, column=1, columnspan=2)
         self.__umw_entry = tkinter.Entry(self.__root)
         self.__umw_entry.grid(row=4, column=3, columnspan=3)
 
         self.__tpw_unit_label = tkinter.Label(self.__root, text="[int]")
         self.__tpw_unit_label.grid(row=5, column=0, columnspan=1)
-        self.__tpw_label = tkinter.Label(self.__root, text="tpw:")
+        self.__tpw_label = tkinter.Label(self.__root, text="training per week:")
         self.__tpw_label.grid(row=5, column=1, columnspan=2)
         self.__tpw_entry = tkinter.Entry(self.__root)
         self.__tpw_entry.grid(row=5, column=3, columnspan=3)
 
         self.__fed_unit_label = tkinter.Label(self.__root, text="[bool]")
         self.__fed_unit_label.grid(row=6, column=0, columnspan=1)
-        self.__fed_label = tkinter.Label(self.__root, text="fed:")
+        self.__fed_label = tkinter.Label(self.__root, text="family early deaths:")
         self.__fed_label.grid(row=6, column=1, columnspan=2)
         self.__fed_entry = tkinter.Entry(self.__root)
         self.__fed_entry.grid(row=6, column=3, columnspan=3)
@@ -288,7 +288,7 @@ class PatientApplication:
 
         self.__waf_unit_label = tkinter.Label(self.__root, text="[bool]")
         self.__waf_unit_label.grid(row=10, column=0, columnspan=1)
-        self.__waf_label = tkinter.Label(self.__root, text="waf:")
+        self.__waf_label = tkinter.Label(self.__root, text="weakness and fatigue:")
         self.__waf_label.grid(row=10, column=1, columnspan=2)
         self.__waf_entry = tkinter.Entry(self.__root)
         self.__waf_entry.grid(row=10, column=3, columnspan=3)
@@ -379,27 +379,27 @@ class PatientApplication:
         if temperature_value is None:
             return
 
-        cas_value = PatientApplication.__validate_bool_entry(self.__cas_entry.get(), "cas")
+        cas_value = PatientApplication.__validate_bool_entry(self.__cas_entry.get(), "coughing and sneezing")
         if cas_value is None:
             return
         
-        waf_value = PatientApplication.__validate_bool_entry(self.__waf_entry.get(), "waf")
+        waf_value = PatientApplication.__validate_bool_entry(self.__waf_entry.get(), "weakness and fatigue")
         if waf_value is None:
             return
 
-        bpm_value = PatientApplication.__validate_int_entry(self.__bpm_entry.get(), "bpm", False)
+        bpm_value = PatientApplication.__validate_int_entry(self.__bpm_entry.get(), "beers per month", False)
         if bpm_value is None:
             return
         
-        umw_value = PatientApplication.__validate_int_entry(self.__umw_entry.get(), "umw", False)
+        umw_value = PatientApplication.__validate_int_entry(self.__umw_entry.get(), "unhealthy meals a week", False)
         if umw_value is None:
             return
         
-        tpw_value = PatientApplication.__validate_int_entry(self.__tpw_entry.get(), "tpw", False)
+        tpw_value = PatientApplication.__validate_int_entry(self.__tpw_entry.get(), "training per week", False)
         if tpw_value is None:
             return
         
-        fed_value = PatientApplication.__validate_bool_entry(self.__fed_entry.get(), "fed")
+        fed_value = PatientApplication.__validate_bool_entry(self.__fed_entry.get(), "family early deaths")
         if fed_value is None:
             return
 
