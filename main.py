@@ -57,7 +57,7 @@ class Patient:
         self.__temperature = temperature
         self.__blood_pressure = blood_pressure
         self.__cas = cas  # cas -> coughing and sneezing
-        self.__waf = waf # waf -> weakness and fatigue
+        self.__waf = waf  # waf -> weakness and fatigue
         self.__bpm = bpm  # bpm -> beers per month
         self.__umw = umw  # umw -> unhealthy meals a week
         self.__tpw = tpw  # tpw -> training per week
@@ -256,35 +256,35 @@ class PatientApplication:
 
         self.__cas_unit_label = tkinter.Label(self.__root, text="[bool]")
         self.__cas_unit_label.grid(row=3, column=0, columnspan=1)
-        self.__cas_label = tkinter.Label(self.__root, text="cas:")
+        self.__cas_label = tkinter.Label(self.__root, text="coughing and sneezing:")
         self.__cas_label.grid(row=3, column=1, columnspan=2)
         self.__cas_entry = tkinter.Entry(self.__root)
         self.__cas_entry.grid(row=3, column=3, columnspan=3)
 
         self.__bpm_unit_label = tkinter.Label(self.__root, text="[int]")
         self.__bpm_unit_label.grid(row=4, column=0, columnspan=1)
-        self.__bpm_label = tkinter.Label(self.__root, text="bpm:")
+        self.__bpm_label = tkinter.Label(self.__root, text="beers per month:")
         self.__bpm_label.grid(row=4, column=1, columnspan=2)
         self.__bpm_entry = tkinter.Entry(self.__root)
         self.__bpm_entry.grid(row=4, column=3, columnspan=3)
 
         self.__umw_unit_label = tkinter.Label(self.__root, text="[int]")
         self.__umw_unit_label.grid(row=5, column=0, columnspan=1)
-        self.__umw_label = tkinter.Label(self.__root, text="umw:")
+        self.__umw_label = tkinter.Label(self.__root, text="unhealthy meals a week:")
         self.__umw_label.grid(row=5, column=1, columnspan=2)
         self.__umw_entry = tkinter.Entry(self.__root)
         self.__umw_entry.grid(row=5, column=3, columnspan=3)
 
         self.__tpw_unit_label = tkinter.Label(self.__root, text="[int]")
         self.__tpw_unit_label.grid(row=6, column=0, columnspan=1)
-        self.__tpw_label = tkinter.Label(self.__root, text="tpw:")
+        self.__tpw_label = tkinter.Label(self.__root, text="training per week:")
         self.__tpw_label.grid(row=6, column=1, columnspan=2)
         self.__tpw_entry = tkinter.Entry(self.__root)
         self.__tpw_entry.grid(row=6, column=3, columnspan=3)
 
         self.__fed_unit_label = tkinter.Label(self.__root, text="[bool]")
         self.__fed_unit_label.grid(row=7, column=0, columnspan=1)
-        self.__fed_label = tkinter.Label(self.__root, text="fed:")
+        self.__fed_label = tkinter.Label(self.__root, text="family early deaths:")
         self.__fed_label.grid(row=7, column=1, columnspan=2)
         self.__fed_entry = tkinter.Entry(self.__root)
         self.__fed_entry.grid(row=7, column=3, columnspan=3)
@@ -312,7 +312,7 @@ class PatientApplication:
 
         self.__waf_unit_label = tkinter.Label(self.__root, text="[bool]")
         self.__waf_unit_label.grid(row=11, column=0, columnspan=1)
-        self.__waf_label = tkinter.Label(self.__root, text="waf:")
+        self.__waf_label = tkinter.Label(self.__root, text="weakness and fatigue:")
         self.__waf_label.grid(row=11, column=1, columnspan=2)
         self.__waf_entry = tkinter.Entry(self.__root)
         self.__waf_entry.grid(row=11, column=3, columnspan=3)
